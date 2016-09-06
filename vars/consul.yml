@@ -1,0 +1,10 @@
+ec2_keypair: "pf-us-east"
+ec2_security_group: "sg-9c64e1f9"
+ec2_instance_type: "t2.nano"
+ec2_image: "ami-6869aa05"
+ec2_subnet_ids: ['subnet-dcaaae9a','subnet-6579614d','subnet-74957603']
+ec2_region: "us-east-1"
+ec2_tag_Name: "consul"
+ec2_tag_Type: "consul"
+ec2_tag_Environment: "non-prod"
+ec2_volume_size: 16
