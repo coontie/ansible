@@ -1,0 +1,7 @@
+---
+- hosts: '{{ hosts }}'
+  become: yes
+  serial: 1
+  tasks:
+    - name: new state '{{ state }}' for service '{{ service }}'
+      service: name={{service}} state={{state}}

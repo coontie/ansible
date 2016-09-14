@@ -1,0 +1,66 @@
+input {
+  beats {
+    port => 5043
+    congestion_threshold => 40
+  }
+}
+
+filter {
+  if [type] == "IIS" {
+    if [message] =~ "^#" {
+                drop {}
+    }
+    grok {
+          match => { "message" => "%{TIMESTAMP_ISO8601:log_timestamp} %{URIPATH:cs_uri_stem} %{NOTSPACE:querystring} \"%{WINPATH:contentpath}\" %{BASE10NUM:status} \"%{HOSTNAME:host}\" %{NOTSPACE:referrer} %{BASE10NUM:Win32_status} %{BASE10NUM:sc_bytes} %{BASE10NUM:cs_bytes} %{BASE10NUM:W3WP_PrivateBytes} %{USERNAME:username} %{QUOTEDSTRING:User_Agent} %{TIME:time_local} %{BASE10NUM:TimeTakenMS} %{BASE10NUM:sc_substatus} \"%{WORD:sitename}\" %{IPV4:S_IP} %{BASE10NUM:port} %{NOTSPACE:RequestsPerSecond} %{NOTSPACE:proxy} %{QUOTEDSTRING:cs_version} \"%{WORD:protocol}\" %{WORD:method} \"%{IPV4:Host_IP}\" %{TIMESTAMP_ISO8601:EndRequest_UTC} (?<local_date>%{YEAR}-%{MONTHNUM}-%{MONTHDAY})  %{BASE10NUM:CurrentConnections} %{BASE10NUM:CPU_Utilization} - %{IPV4:Client_IP} %{TIMESTAMP_ISO8601:BeginRequest_UTC}" }
+    }
+  } #end of if [type] == "IIS"
+
+  if [type] == ["mongo_log"] {
+    grok {
+      match => { "message" => "%{TIMESTAMP_ISO8601:timestamp} \[%{WORD:component}\] %{GREEDYDATA:message}"}
+      overwrite => [ "message" ]
+    }
+   mutate { add_tag => "Mongo" }
+  } #end of if [type] == ["mongo_log"]
+
+ if [type] == "security_log" {
+    grok {
+      match => [ "message", "%{TIMESTAMP_ISO8601:timestamp} %{LOGLEVEL:severity} %{GREEDYDATA:message}" ]
+      overwrite => [ "message" ]
+    }
+  }
+
+ if [type] == "biconnector_log" {
+    grok {
+      match => [ "message", "%{TIMESTAMP_ISO8601:timestamp} %{LOGLEVEL:severity} %{GREEDYDATA:message}" ]
+      overwrite => [ "message" ]
+    }
+  }
+ 
+
+ if [type] == "java" {
+    grok {
+      match => [ "message", "%{TIMESTAMP_ISO8601:timestamp} %{LOGLEVEL:severity} %{GREEDYDATA:message}" ]
+      overwrite => [ "message" ]
+    }
+  }
+
+# if [Saber] in [source] {
+#   mutate { add_tag => "Saber" }
+# }
+#
+ if [type] == "saber_log" {
+    grok {
+      match => [ "message", "%{TIMESTAMP_ISO8601:timestamp} %{LOGLEVEL:severity} %{GREEDYDATA:message}" ]
+      overwrite => [ "message" ]
+    }
+  }
+}
+
+output {
+        elasticsearch {
+                hosts => "search-pfprod-x5hfpyhf3awr3hlxh5xv4ngaxu.us-west-2.es.amazonaws.com:80"
+                index => "filebeat-%{+YYYY.MM.dd}"
+   }
+}
+
