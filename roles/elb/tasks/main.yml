@@ -1,0 +1,15 @@
+---
+- name: Create the Ingest Layer Logstash ELB
+   ec2_elb_lb:
+   name: "{{ elb_name }}"
+    security_group_names: "{{ elb_security_group_name }}"
+    state: present
+    region: "{{ vpc_region }}"
+    subnets: "{{ elb_subnet_id }}"
+    purge_subnets: "{{ elb_purge_subnets }}"
+    cross_az_load_balancing: "{{ elb_cross_az_load_balancing }}"
+    connection_draining_timeout: "{{ elb_connection_draining_timeout }}"
+    listeners: "{{ elb_listeners }}"
+    stickiness: "{{ elb_stickiness }}"
+    health_check: "{{ elb_health_check }}"
+  register: elb
