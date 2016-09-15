@@ -1,0 +1,6 @@
+---
+- hosts: '{{ hosts }}'
+  become: yes
+  tasks:
+    - name: fetch '{{file}}'
+      fetch: dest=save/{{file}}.{{ansible_hostname}} src={{file}} flat=yes
